@@ -64,7 +64,7 @@ class PriceTariffsRelationManager extends RelationManager
                 Tables\Actions\AttachAction::make()
                     ->label('Tarife Ekle')
                     ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('price_tariffs.is_active', true))
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('price_tariffs.is_active', true)->orderBy('price_tariffs.order'))
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\Toggle::make('is_active')
