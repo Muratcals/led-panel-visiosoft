@@ -117,39 +117,42 @@ class DisplayController extends Controller
 
     /**
      * API endpoint - Cihaz hash kontrolü için
-     * Cihaz kodu zorunlu - ?device=DEVICE_CODE parametresi ile çalışır
+     * Cihaz kodu opsiyonel - IP adresine göre otomatik tanıma yapılır
      */
     public function api(Request $request)
     {
         $deviceCode = $request->query('device');
+        $clientIp = $request->ip();
         
-        // Cihaz kodu yoksa hata döndür
-        if (!$deviceCode) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cihaz kodu gerekli: ?device=CIHAZ_KODU',
-                'code' => 'NO_DEVICE_CODE'
-            ], 400);
+        // Cihaz koduna göre ara
+        if ($deviceCode) {
+            $device = Device::where('device_code', $deviceCode)->first();
+        } else {
+            // Cihaz kodu yoksa IP adresine göre bul
+            $device = Device::where('ip_address', $clientIp)->first();
         }
         
-        // Cihazı bul
-        $device = Device::where('device_code', $deviceCode)->first();
-        
+        // Cihaz bulunamadıysa yeni oluştur
         if (!$device) {
-            return response()->json([
-                'success' => false,
-                'hash' => null,
+            if (!$deviceCode) {
+                $deviceCode = 'AUTO-' . strtoupper(substr(md5($clientIp), 0, 8));
+            }
+            
+            $device = Device::create([
                 'device_code' => $deviceCode,
-                'status' => 'not_found',
-                'message' => 'Cihaz bulunamadı'
-            ], 404);
+                'name' => 'Otomatik Cihaz - ' . $clientIp,
+                'location' => 'Otomatik Kayıt',
+                'status' => 'active',
+                'ip_address' => $clientIp,
+                'last_sync_at' => now(),
+            ]);
         }
         
         if ($device->status !== 'active') {
             return response()->json([
                 'success' => false,
                 'hash' => null,
-                'device_code' => $deviceCode,
+                'device_code' => $device->device_code,
                 'status' => $device->status,
                 'message' => 'Cihaz aktif değil'
             ], 403);
@@ -158,9 +161,10 @@ class DisplayController extends Controller
         return response()->json([
             'success' => true,
             'hash' => $this->calculateDeviceDataHash($device),
-            'device_code' => $deviceCode,
+            'device_code' => $device->device_code,
             'device_name' => $device->name,
             'status' => 'active',
+            'last_update' => now()->toIso8601String(),
         ]);
     }
 

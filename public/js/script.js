@@ -164,16 +164,29 @@ function getApiUrl(endpoint) {
 
 // İçerik güncellemelerini kontrol et
 function checkForUpdates() {
+    const apiUrl = getApiUrl('/api/display');
+    console.log('Güncelleme kontrol ediliyor:', apiUrl);
+    
     // IP tabanlı cihazlar için: cihaz kodu olmadan da API çağrısı yap
-    fetch(getApiUrl('/api/display'))
-        .then(response => response.json())
+    fetch(apiUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('API Yanıtı:', data);
+            console.log('Mevcut hash:', currentDataHash, '| Yeni hash:', data.hash);
+            
             if (data.hash && data.hash !== currentDataHash) {
-                console.log('Yeni içerik algılandı, sayfa yenileniyor...');
+                console.log('✅ Yeni içerik algılandı, sayfa yenileniyor...');
                 window.location.reload();
+            } else {
+                console.log('ℹ️ İçerik değişmedi');
             }
         })
-        .catch(error => console.error('Güncelleme kontrolü hatası:', error));
+        .catch(error => console.error('❌ Güncelleme kontrolü hatası:', error));
 }
 
 // Cihaz heartbeat gönder (cihaz kodu varsa)
@@ -228,13 +241,21 @@ function registerDevice() {
 
 // Başlangıçta cihazı kaydet
 if (deviceCode) {
-    console.log('Cihaz modu aktif:', deviceCode);
+    console.log('🔵 Cihaz modu aktif:', deviceCode);
     registerDevice();
+} else {
+    console.log('🔵 IP tabanlı mod aktif (cihaz kodu yok)');
 }
 
 // Hash varsa periyodik güncelleme kontrolü başlat
 if (currentDataHash) {
+    console.log('🔄 Otomatik güncelleme başlatıldı:', checkUpdateInterval / 1000, 'saniyede bir kontrol');
+    console.log('📌 Başlangıç hash:', currentDataHash);
     setInterval(checkForUpdates, checkUpdateInterval);
+    // İlk kontrolü hemen yap
+    setTimeout(checkForUpdates, 2000);
+} else {
+    console.warn('⚠️ Data hash bulunamadı, otomatik güncelleme çalışmayacak!');
 }
 
 // Cihaz kodu varsa periyodik heartbeat başlat

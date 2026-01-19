@@ -86,7 +86,11 @@ class AdSlidesRelationManager extends RelationManager
                 Tables\Actions\AttachAction::make()
                     ->label('Slayt Ekle')
                     ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('ad_slides.is_active', true)->orderBy('ad_slides.position'))
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query
+                        ->where('ad_slides.is_active', true)
+                        ->whereDoesntHave('devices', fn ($q) => $q->where('devices.id', $this->getOwnerRecord()->id))
+                        ->orderBy('ad_slides.position')
+                    )
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\TextInput::make('order')
