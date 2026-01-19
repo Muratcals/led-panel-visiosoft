@@ -117,14 +117,14 @@ class DisplayController extends Controller
 
     /**
      * API endpoint - Cihaz hash kontrolü için
-     * Cihaz kodu opsiyonel - IP adresine göre otomatik tanıma yapılır
+     * Cihaz kodu opsiyonel - IP adresine göre de çalışır
      */
     public function api(Request $request)
     {
         $deviceCode = $request->query('device');
         $clientIp = $request->ip();
         
-        // Cihaz koduna göre ara
+        // Önce cihaz koduna göre ara
         if ($deviceCode) {
             $device = Device::where('device_code', $deviceCode)->first();
         } else {
@@ -132,20 +132,14 @@ class DisplayController extends Controller
             $device = Device::where('ip_address', $clientIp)->first();
         }
         
-        // Cihaz bulunamadıysa yeni oluştur
         if (!$device) {
-            if (!$deviceCode) {
-                $deviceCode = 'AUTO-' . strtoupper(substr(md5($clientIp), 0, 8));
-            }
-            
-            $device = Device::create([
+            return response()->json([
+                'success' => false,
+                'hash' => null,
                 'device_code' => $deviceCode,
-                'name' => 'Otomatik Cihaz - ' . $clientIp,
-                'location' => 'Otomatik Kayıt',
-                'status' => 'active',
-                'ip_address' => $clientIp,
-                'last_sync_at' => now(),
-            ]);
+                'status' => 'not_found',
+                'message' => 'Cihaz bulunamadı'
+            ], 404);
         }
         
         if ($device->status !== 'active') {
@@ -164,7 +158,6 @@ class DisplayController extends Controller
             'device_code' => $device->device_code,
             'device_name' => $device->name,
             'status' => 'active',
-            'last_update' => now()->toIso8601String(),
         ]);
     }
 

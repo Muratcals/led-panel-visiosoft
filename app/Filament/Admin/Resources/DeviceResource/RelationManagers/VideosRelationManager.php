@@ -76,12 +76,7 @@ class VideosRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label('Video Ekle')
-                    ->preloadRecordSelect()
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query
-                        ->where('videos.is_active', true)
-                        ->whereDoesntHave('devices', fn ($q) => $q->where('devices.id', $this->getOwnerRecord()->id))
-                        ->orderBy('videos.order')
-                    )
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('videos.is_active', true)->select('videos.*'))
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\TextInput::make('order')
