@@ -1,0 +1,85 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Laravel specific
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore
+/storage/*.key
+/storage/app/*
+!/storage/app/.gitignore
+!/storage/app/public/
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+
+# Environment files
+.env
+.env.backup
+.env.production
+.env.staging
+.phpunit.result.cache
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Compiled files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build files
+/public/hot
+/public/storage
+/public/build
+/public/css/filament/**
+/public/js/filament/**
+
+# Database
+*.sqlite
+*.sqlite-journal
+database.sqlite
+
+# PHP
+php.ini
+phpinfo.php
+
+# Public uploads (user-generated content)
+/public/videos/*
+!/public/videos/.gitignore
+/public/images/uploads/
+/storage/app/public/*
+!/storage/app/public/.gitignore
+
+# Testing
+.phpunit.cache
+/coverage/
+.phpunit.result.cache
+
+# Composer
+composer.phar
+composer.lock
+
+# Node
+package-lock.json
+yarn.lock
+
+# Other
+auth.json
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
