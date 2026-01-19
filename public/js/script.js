@@ -164,6 +164,7 @@ function getApiUrl(endpoint) {
 
 // İçerik güncellemelerini kontrol et
 function checkForUpdates() {
+    // IP tabanlı cihazlar için: cihaz kodu olmadan da API çağrısı yap
     fetch(getApiUrl('/api/display'))
         .then(response => response.json())
         .then(data => {

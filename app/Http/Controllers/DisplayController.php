@@ -13,34 +13,46 @@ class DisplayController extends Controller
 {
     /**
      * LED Panel ana görünümü
-     * Cihaz kodu zorunlu - ?device=DEVICE_CODE parametresi ile çalışır
+     * Cihaz kodu opsiyonel - IP adresine göre otomatik tanıma yapılır
      */
     public function index(Request $request)
     {
         $deviceCode = $request->query('device');
+        $clientIp = $request->ip();
         
-        // Cihaz kodu yoksa hata sayfası göster
-        if (!$deviceCode) {
-            return response()->view('display.error', [
-                'title' => 'Cihaz Kodu Gerekli',
-                'message' => 'Lütfen URL\'ye cihaz kodu ekleyin: /display?device=CIHAZ_KODU',
-                'code' => 'NO_DEVICE_CODE'
-            ], 400);
-        }
-        
-        // Cihazı bul
-        $device = Device::where('device_code', $deviceCode)->first();
-        
-        // Cihaz bulunamadıysa otomatik kaydet
-        if (!$device) {
-            $device = Device::create([
-                'device_code' => $deviceCode,
-                'name' => 'Yeni Cihaz - ' . $deviceCode,
-                'location' => 'Belirlenmedi',
-                'status' => 'active',
-                'ip_address' => $request->ip(),
-                'last_sync_at' => now(),
-            ]);
+        // Önce cihaz koduna göre ara
+        if ($deviceCode) {
+            $device = Device::where('device_code', $deviceCode)->first();
+            
+            // Cihaz bulunamadıysa otomatik kaydet
+            if (!$device) {
+                $device = Device::create([
+                    'device_code' => $deviceCode,
+                    'name' => 'Yeni Cihaz - ' . $deviceCode,
+                    'location' => 'Belirlenmedi',
+                    'status' => 'active',
+                    'ip_address' => $clientIp,
+                    'last_sync_at' => now(),
+                ]);
+            }
+        } else {
+            // Cihaz kodu yoksa IP adresine göre bul veya oluştur
+            $device = Device::where('ip_address', $clientIp)->first();
+            
+            if (!$device) {
+                // IP ile kayıtlı cihaz yok, otomatik oluştur
+                $deviceCode = 'AUTO-' . strtoupper(substr(md5($clientIp), 0, 8));
+                $device = Device::create([
+                    'device_code' => $deviceCode,
+                    'name' => 'Otomatik Cihaz - ' . $clientIp,
+                    'location' => 'Otomatik Kayıt',
+                    'status' => 'active',
+                    'ip_address' => $clientIp,
+                    'last_sync_at' => now(),
+                ]);
+            }
+            
+            $deviceCode = $device->device_code;
         }
         
         // Cihaz aktif değilse uyarı göster
@@ -56,7 +68,7 @@ class DisplayController extends Controller
         // Cihazın son erişim zamanını güncelle
         $device->update([
             'last_sync_at' => now(),
-            'ip_address' => $request->ip(),
+            'ip_address' => $clientIp,
         ]);
         
         // Cihaza atanmış videoları getir
