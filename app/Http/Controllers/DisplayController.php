@@ -187,7 +187,10 @@ class DisplayController extends Controller
         // Pivot tablolarındaki değişiklikleri de dahil et
         $pivotVideoUpdate = $device->videos()->max('device_video.updated_at');
         $pivotSlideUpdate = $device->adSlides()->max('device_ad_slide.updated_at');
+        
+        // Genel ayarlar değişikliklerini de dahil et
+        $lastSettingUpdate = Setting::max('updated_at');
 
-        return md5($lastVideoUpdate . $lastSlideUpdate . $lastTariffUpdate . $deviceUpdate . $pivotVideoUpdate . $pivotSlideUpdate);
+        return md5($lastVideoUpdate . $lastSlideUpdate . $lastTariffUpdate . $deviceUpdate . $pivotVideoUpdate . $pivotSlideUpdate . $lastSettingUpdate);
     }
 }

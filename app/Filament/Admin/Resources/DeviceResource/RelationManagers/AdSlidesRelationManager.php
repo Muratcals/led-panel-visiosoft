@@ -85,7 +85,8 @@ class AdSlidesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label('Slayt Ekle')
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('ad_slides.is_active', true)->select('ad_slides.*'))
+                    ->preloadRecordSelect()
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('ad_slides.is_active', true)->reorder())
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\TextInput::make('order')
@@ -116,6 +117,6 @@ class AdSlidesRelationManager extends RelationManager
                     Tables\Actions\DetachBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('pivot.order', 'asc');
+            ->defaultSort('device_ad_slide.order', 'asc');
     }
 }

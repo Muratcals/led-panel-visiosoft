@@ -104,6 +104,11 @@
     <!-- Alt Fiyat Tarifesi Alanı (2/3) -->
     <div class="price-section" id="sliderContainer">
 
+        @php
+            $showPriceSection = ($settings['show_price_section'] ?? '1') === '1' || ($settings['show_price_section'] ?? true) === true;
+        @endphp
+
+        @if($showPriceSection)
         <!-- Page 1: Fiyat Tarifesi & Sidebar -->
         <div class="slide content-slide active" data-duration="20">
             <!-- Sol Mavi Banner -->
@@ -295,6 +300,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
 
 
@@ -333,7 +339,7 @@
         {{-- Alt Video Slaytları (varsa) --}}
         @foreach($bottomVideos as $video)
             <div class="slide video-slide" data-duration="{{ $video->duration }}">
-                <video muted loop playsinline preload="auto" data-video-id="{{ $video->id }}">
+                <video autoplay muted loop playsinline preload="auto" data-video-id="{{ $video->id }}">
                     @if($video->file_path)
                         <source src="{{ asset('storage/' . $video->file_path) }}" type="video/mp4">
                     @endif

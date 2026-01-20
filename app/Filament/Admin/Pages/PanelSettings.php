@@ -53,6 +53,7 @@ class PanelSettings extends Page implements HasForms
             'show_qr_code' => ($settings['show_qr_code'] ?? '1') === '1',
             'show_contact' => ($settings['show_contact'] ?? '1') === '1',
             'show_vehicle_rates' => ($settings['show_vehicle_rates'] ?? '1') === '1',
+            'show_price_section' => ($settings['show_price_section'] ?? '1') === '1',
             'vehicle_rate_2' => $settings['vehicle_rate_2'] ?? '2 KAT',
             'vehicle_rate_3' => $settings['vehicle_rate_3'] ?? '3 KAT',
             'vehicle_rate_4' => $settings['vehicle_rate_4'] ?? '4 KAT',
@@ -240,13 +241,18 @@ class PanelSettings extends Page implements HasForms
                                             ->helperText('Logo yüklenirse metin yerine logo gösterilir. Önerilen boyut: 1300x350 piksel'),
                                     ]),
 
-                                Forms\Components\Section::make('Fiyat Tarifesi Görünümü')
-                                    ->description('Fiyat tarifesinin ekranda gösterilip gösterilmeyeceğini ayarlayın')
+                                Forms\Components\Section::make('Fiyat Sayfası Görünümü')
+                                    ->description('Fiyat sayfasının tamamının veya sadece tarifenin gösterilip gösterilmeyeceğini ayarlayın')
                                     ->schema([
+                                        Forms\Components\Toggle::make('show_price_section')
+                                            ->label('Fiyat Sayfasını Göster')
+                                            ->default(true)
+                                            ->helperText('Kapatırsanız fiyat sayfasının tamamı (sidebar + tarife) gizlenir')
+                                            ->columnSpanFull(),
                                         Forms\Components\Toggle::make('show_tariff')
                                             ->label('Fiyat Tarifesini Göster')
                                             ->default(true)
-                                            ->helperText('Kapatırsanız fiyat tarifesi ekranda görünmez'),
+                                            ->helperText('Kapatırsanız sadece fiyat tarifesi gizlenir, sayfa kalır'),
                                     ]),
 
                                 Forms\Components\Section::make('Ödeme İkonları')
@@ -371,6 +377,7 @@ class PanelSettings extends Page implements HasForms
             'show_qr_code' => 'QR kod gösterilsin mi',
             'show_contact' => 'İletişim numarası gösterilsin mi',
             'show_vehicle_rates' => 'Araç oranları slaytı gösterilsin mi',
+            'show_price_section' => 'Fiyat sayfası gösterilsin mi',
             'vehicle_rate_2' => '2. Sınıf araç oranı',
             'vehicle_rate_3' => '3. Sınıf araç oranı',
             'vehicle_rate_4' => '4. Sınıf araç oranı',

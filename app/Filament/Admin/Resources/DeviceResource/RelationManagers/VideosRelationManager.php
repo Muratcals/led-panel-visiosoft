@@ -76,7 +76,8 @@ class VideosRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label('Video Ekle')
-                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('videos.is_active', true)->select('videos.*'))
+                    ->preloadRecordSelect()
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query->where('videos.is_active', true)->reorder()->orderBy('videos.order', 'asc'))
                     ->form(fn (Tables\Actions\AttachAction $action): array => [
                         $action->getRecordSelect(),
                         Forms\Components\TextInput::make('order')
@@ -107,6 +108,6 @@ class VideosRelationManager extends RelationManager
                     Tables\Actions\DetachBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('pivot.order', 'asc');
+            ->defaultSort('device_video.order', 'asc');
     }
 }

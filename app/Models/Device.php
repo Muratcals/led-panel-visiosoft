@@ -13,6 +13,7 @@ class Device extends Model
         'location',
         'ip_address',
         'status',
+        'fullscreen_video',
         'last_sync_at',
         'settings',
         'notes',
@@ -21,6 +22,7 @@ class Device extends Model
     protected $casts = [
         'settings' => 'array',
         'last_sync_at' => 'datetime',
+        'fullscreen_video' => 'boolean',
     ];
 
     /**
@@ -31,7 +33,7 @@ class Device extends Model
         return $this->belongsToMany(Video::class, 'device_video')
             ->withPivot('order', 'is_active')
             ->withTimestamps()
-            ->orderBy('order');
+            ->orderBy('device_video.order');
     }
 
     /**
@@ -42,7 +44,7 @@ class Device extends Model
         return $this->belongsToMany(AdSlide::class, 'device_ad_slide')
             ->withPivot('order', 'is_active')
             ->withTimestamps()
-            ->orderBy('order');
+            ->orderBy('device_ad_slide.order');
     }
 
     /**
